@@ -67,7 +67,7 @@ classDiagram
     IVehicule <|.. Vehicule
     IVueVehicule <|.. VueVehicule
     IVehicule "1" --> "0..*" IVueVehicule : observateurs
-    Vehicule "1" o-- "0..*" VueVehicule : vuesVehicule
+    Vehicule "1" <-- "" VueVehicule : vuesVehicule
 ```
 
 La relation entre `IVehicule` et `IVueVehicule` est unidirectionnelle : un sujet
