@@ -20,18 +20,21 @@ Ce patron permet notamment de :
 
 L'exemple représente un véhicule et ses vues :
 
+`IVehicule` joue le rôle du sujet abstrait et `Vehicule` celui du sujet
+concret. `IVueVehicule` représente l'observateur abstrait et `VueVehicule`
+l'observateur concret.
+
 ## Architecture UML
 
-Le diagramme suivant présente les relations entre le sujet observé, les
-observateurs et leurs interfaces :
+Le diagramme correspond à l'implémentation présente dans le code :
 
 ```mermaid
 classDiagram
     class IVehicule {
         <<interface>>
-        +ajouterVueVehicule(IVueVehicule vue)
-        +retirerVueVehicule(IVueVehicule vue)
-        +notifierVuesVehicule()
+        +ajouterVueVehicule(vue : IVueVehicule) void
+        +retirerVueVehicule(vue : IVueVehicule) void
+        +notifierVuesVehicule() void
         +getDescription() String
         +getPrix() double
     }
@@ -40,28 +43,39 @@ classDiagram
         -description String
         -prix double
         -vuesVehicule Set~IVueVehicule~
-        +ajouterVueVehicule(IVueVehicule vue)
-        +retirerVueVehicule(IVueVehicule vue)
-        +notifierVuesVehicule()
-        +setDescription(String description)
-        +setPrix(double prix)
+        +Vehicule(description : String, prix : double)
+        +ajouterVueVehicule(vue : IVueVehicule) void
+        +retirerVueVehicule(vue : IVueVehicule) void
+        +notifierVuesVehicule() void
+        +setDescription(description : String) void
+        +getDescription() String
+        +getPrix() double
+        +setPrix(prix : double) void
     }
 
     class IVueVehicule {
         <<interface>>
-        +actualise()
+        +actualise() void
     }
 
     class VueVehicule {
         -vehicule IVehicule
-        +actualise()
+        +VueVehicule(vehicule : IVehicule)
+        +actualise() void
     }
 
-    IVehicule <|.. Vehicule : implémente
-    IVueVehicule <|.. VueVehicule : implémente
-    Vehicule o-- "0..*" IVueVehicule : notifie
-    VueVehicule --> IVehicule : observe
+    IVehicule <|.. Vehicule
+    IVueVehicule <|.. VueVehicule
+    IVehicule ..> IVueVehicule : utilise
+    Vehicule "1" o-- "0..*" IVueVehicule : vuesVehicule
+    VueVehicule --> IVehicule : vehicule
 ```
 
-`App.java` crée un `Vehicule`, lui associe plusieurs `VueVehicule`, puis
-déclenche des notifications lorsque sa description ou son prix change.
+`IVehicule` possède une dépendance vers `IVueVehicule`, car ses opérations
+d'inscription, de retrait et de notification manipulent ce type. `Vehicule`
+matérialise cette relation en conservant une collection de vues observatrices.
+
+Lorsque `setDescription` ou `setPrix` modifie réellement l'état du véhicule,
+`Vehicule.notifierVuesVehicule()` parcourt `vuesVehicule` et appelle
+`actualise()` sur chaque observateur. L'inscription et le retrait des vues
+sont réalisés avec `ajouterVueVehicule()` et `retirerVueVehicule()`.
