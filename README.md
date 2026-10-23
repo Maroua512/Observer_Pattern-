@@ -67,17 +67,15 @@ classDiagram
     IVehicule <|.. Vehicule
     IVueVehicule <|.. VueVehicule
     IVehicule "1" --> "0..*" IVueVehicule : observateurs
-    Vehicule "1" o-- "0..*" IVueVehicule : vuesVehicule
-    VueVehicule "1" --> "1" IVehicule : vehicule
+    Vehicule "1" o-- "0..*" VueVehicule : vuesVehicule
 ```
 
 La relation entre `IVehicule` et `IVueVehicule` est unidirectionnelle : un sujet
 peut gérer zéro à plusieurs observateurs. Dans l'implémentation concrète,
-`Vehicule` conserve une collection de `IVueVehicule`, tandis que chaque
-`VueVehicule` possède une référence vers un seul sujet. Dans `App.java`, ce
-sujet est concrètement un objet `Vehicule`. La référence est déclarée avec le
-type abstrait `IVehicule` dans le code, ce qui permet de respecter le faible
-couplage du patron.
+`Vehicule` est associé à plusieurs `VueVehicule`. Le constructeur de
+`VueVehicule` reçoit bien une référence de type `IVehicule`, mais cette
+dépendance d'implémentation n'est pas représentée comme une association
+visible entre l'interface du sujet et la classe de l'observateur concret.
 
 Lorsque `setDescription` ou `setPrix` modifie réellement l'état du véhicule,
 `Vehicule.notifierVuesVehicule()` parcourt `vuesVehicule` et appelle
