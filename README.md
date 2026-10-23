@@ -1,20 +1,67 @@
-# Observateur
+# Patron Observateur en Java
 
-Application console Java construite avec Maven.
+Ce projet est une application console Java qui présente une implémentation du
+patron de conception **Observateur** avec Maven.
 
-## Prerequis
+## Rôle du patron Observateur
 
-- JDK 17 ou une version plus recente
-- Maven 3.9 ou une version plus recente
+Le patron Observateur définit une relation entre un objet principal, appelé
+**sujet observé**, et plusieurs objets dépendants, appelés **observateurs**.
+Lorsque l'état du sujet change, celui-ci informe automatiquement tous les
+observateurs inscrits.
 
-## Lancer l'application
+Ce patron permet notamment de :
 
-```powershell
-mvn compile
-mvn exec:java
+- notifier plusieurs objets à partir d'une seule modification ;
+- ajouter ou retirer des observateurs sans modifier le sujet ;
+- réduire le couplage entre l'objet observé et ses vues ou dépendances.
+
+## Exemple traité
+
+L'exemple représente un véhicule et ses vues :
+
+## Architecture UML
+
+Le diagramme suivant présente les relations entre le sujet observé, les
+observateurs et leurs interfaces :
+
+```mermaid
+classDiagram
+    class IVehicule {
+        <<interface>>
+        +ajouterVueVehicule(IVueVehicule vue)
+        +retirerVueVehicule(IVueVehicule vue)
+        +notifierVuesVehicule()
+        +getDescription() String
+        +getPrix() double
+    }
+
+    class Vehicule {
+        -description String
+        -prix double
+        -vuesVehicule Set~IVueVehicule~
+        +ajouterVueVehicule(IVueVehicule vue)
+        +retirerVueVehicule(IVueVehicule vue)
+        +notifierVuesVehicule()
+        +setDescription(String description)
+        +setPrix(double prix)
+    }
+
+    class IVueVehicule {
+        <<interface>>
+        +actualise()
+    }
+
+    class VueVehicule {
+        -vehicule IVehicule
+        +actualise()
+    }
+
+    IVehicule <|.. Vehicule : implémente
+    IVueVehicule <|.. VueVehicule : implémente
+    Vehicule o-- "0..*" IVueVehicule : notifie
+    VueVehicule --> IVehicule : observe
 ```
 
-## Structure
-
-- `src/main/java/com/observateur/App.java` : point d'entree de l'application
-- `pom.xml` : configuration Maven
+`App.java` crée un `Vehicule`, lui associe plusieurs `VueVehicule`, puis
+déclenche des notifications lorsque sa description ou son prix change.
